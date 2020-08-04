@@ -9,6 +9,6 @@ public class TransferController {
 
     @PostMapping(value = "/transfer-certify")
     public void certificationByTransfer(@RequestBody TransferDto transferDto) {
-        
+
     }
 }
