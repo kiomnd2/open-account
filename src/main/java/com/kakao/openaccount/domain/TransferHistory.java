@@ -1,5 +1,7 @@
 package com.kakao.openaccount.domain;
 
+import com.kakao.openaccount.dto.RequestType;
+import com.kakao.openaccount.dto.StateType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -8,6 +10,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 
@@ -16,18 +19,24 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-public class History {
+public class TransferHistory {
 
     @Id @GeneratedValue
     private long id;
 
-    private String userUUID;
+    private Long historyNo;
 
-    private String stageCode;
+    private String requestUserUUID;
 
-    private LocalDateTime certificationDate;
+    private String transferUUID;
 
-    private String resultCode;
+    private String enterpriseCode;
+
+    private String accountNo;
+
+    private RequestType requestType;
+
+    private StateType stateType;
 
 
 
