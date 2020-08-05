@@ -9,11 +9,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class OpenAccountApplication {
 
-    final Sender sender;
-
-    public OpenAccountApplication(Sender sender) {
-        this.sender = sender;
-    }
 
     public static void main(String[] args) {
         SpringApplication.run(OpenAccountApplication.class, args);
