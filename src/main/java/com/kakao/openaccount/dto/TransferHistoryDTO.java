@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
@@ -23,14 +24,11 @@ public class TransferHistoryDTO {
     @NotNull
     private String transferUUID;
 
-    @NotNull
-    private String enterpriseCode;
-
-    @NotNull
-    private String accountNo;
-
     private RequestType requestType;
 
     private StateType stateType;
 
+    private LocalDateTime requestDate;
+
+    private LocalDateTime responseDate;
 }

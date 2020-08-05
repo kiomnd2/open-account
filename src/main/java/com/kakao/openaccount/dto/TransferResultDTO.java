@@ -26,7 +26,6 @@ public class TransferResultDTO {
     @NotNull
     private LocalDateTime responseDate;
 
-    @NotNull
     private boolean error;
 
     private String message;

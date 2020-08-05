@@ -29,7 +29,6 @@ public class TransferRequestDTO {
     @Max(20)
     private String accountNo;
 
-
     private RequestType requestType;
 
     private LocalDateTime requestDate;

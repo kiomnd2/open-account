@@ -26,14 +26,12 @@ public class WordService {
 
     private final WordRepository wordRepository;
 
-    public String findRandomWord() {
+    public long findRandomSequence() {
 
         long count = wordRepository.count();
         long randomKey = (long) (Math.random() * count);
-        Optional<Word> randomWord = wordRepository.findById(randomKey);
-        Word word = randomWord.orElseThrow(NotFoundWordException::new);
 
-        return word.getWordName();
+        return randomKey;
     }
 
 

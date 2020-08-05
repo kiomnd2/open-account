@@ -38,6 +38,8 @@ public class TransferHistory {
 
     private StateType stateType;
 
+    private LocalDateTime requestDate;
 
+    private LocalDateTime responseDate;
 
 }
