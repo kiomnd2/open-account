@@ -2,21 +2,27 @@ package com.kakao.openaccount.service;
 
 import com.kakao.openaccount.dto.TransferRequestDTO;
 import com.kakao.openaccount.dto.TransferResultDTO;
-import com.kakao.openaccount.word.WordRepository;
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 @NoArgsConstructor
-@AllArgsConstructor
-
+@RequiredArgsConstructor
 public class TransferRequestService {
 
-    WordRepository wordRepository;
+
+    WordService wordService;
+
+    @Autowired
+    public TransferRequestService(WordService wordService) {
+        this.wordService = wordService;
+    }
+
 
     public TransferResultDTO requestTransfer(TransferRequestDTO requestDTO) {
-
+        String randomWord = wordService.findRandomWord();
     }
 
     public void saveTempCertificationData(TransferRequestDTO requestDTO) {
@@ -26,7 +32,7 @@ public class TransferRequestService {
 
     public void getTempCertificationData(TransferRequestDTO requestDTO) {
         // memCache 가져오기
-        
+
 
     }
 

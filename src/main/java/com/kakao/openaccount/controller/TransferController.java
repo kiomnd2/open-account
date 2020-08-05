@@ -28,6 +28,10 @@ public class TransferController {
     @PostMapping(value ="{enterpriseCode}/{accountNo}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity certificationByTransfer(@RequestBody @Valid RequestUser requestUser, @PathVariable String enterpriseCode, @PathVariable String accountNo, Errors error ) {
 
+        if(error.hasErrors()) {
+            return ResponseEntity.badRequest().build();
+        }
+
         // 거래 코드 임시 생성
         UUID transferUUID = UUID.randomUUID();
 
@@ -41,12 +45,6 @@ public class TransferController {
         // 요청..
         TransferResultDTO transferResult = transferRequestService.requestTransfer(transferRequester);
 
-
-
-
-        if(error.hasErrors()) {
-            return ResponseEntity.badRequest().build();
-        }
 
         return ResponseEntity.ok().build();
     }

@@ -16,7 +16,7 @@ import static javax.persistence.GenerationType.SEQUENCE;
 @AllArgsConstructor
 @Builder
 @Entity
-public class Words {
+public class Word {
 
     @GeneratedValue(strategy = SEQUENCE)
     @Id
