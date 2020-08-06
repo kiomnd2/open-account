@@ -5,9 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 import static javax.persistence.GenerationType.SEQUENCE;
 
@@ -16,10 +14,16 @@ import static javax.persistence.GenerationType.SEQUENCE;
 @AllArgsConstructor
 @Builder
 @Entity
+@Table(name = "words")
 public class Word {
 
     @GeneratedValue(strategy = SEQUENCE)
     @Id
+    @Column(name = "word_seq")
     private long seq;
+
+    @Column(name = "word_name", nullable = false, length = 4)
     private String wordName;
+
+
 }

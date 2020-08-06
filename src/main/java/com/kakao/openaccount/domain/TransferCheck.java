@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -22,8 +23,10 @@ public class TransferCheck {
     @GeneratedValue
     private long id;
 
+    @Column( name = "user_uuid", nullable = false, length = 40)
     private String userUUID;
 
+    @Column( name = "transfer_uuid", nullable = false, length = 40)
     private String transferUUID;
 
     private long wordSeq;

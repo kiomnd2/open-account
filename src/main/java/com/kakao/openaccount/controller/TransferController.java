@@ -7,7 +7,6 @@ import com.kakao.openaccount.dto.TransferResultDTO;
 import com.kakao.openaccount.service.TransferRequestService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
@@ -39,13 +38,16 @@ public class TransferController {
                 .requestUserUUID(requestUser.getRequestUserUUID())
                 .transferUUID(transferUUID.toString())
                 .accountNo(accountNo)
-                .enterpriseCode(enterpriseCode)
+                .bankCode(enterpriseCode)
                 .requestType(RequestType.TRANSFER).build();
 
         // 요청..
         TransferResultDTO transferResult = transferRequestService.requestTransfer(transferRequester);
 
+        if(transferResult.isError()) {
+            return ResponseEntity.badRequest().body(transferResult); //
+        }
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body(transferResult);
     }
 }

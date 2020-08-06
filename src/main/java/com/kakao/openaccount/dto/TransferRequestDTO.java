@@ -23,7 +23,7 @@ public class TransferRequestDTO {
     private String transferUUID;
 
     @NotNull
-    private String enterpriseCode;
+    private String bankCode;
 
     @NotNull
     @Max(20)

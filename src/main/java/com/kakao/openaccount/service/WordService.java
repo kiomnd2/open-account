@@ -27,11 +27,8 @@ public class WordService {
     private final WordRepository wordRepository;
 
     public long findRandomSequence() {
-
         long count = wordRepository.count();
-        long randomKey = (long) (Math.random() * count);
-
-        return randomKey;
+        return (long) (Math.random() * count);
     }
 
 

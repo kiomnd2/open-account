@@ -1,9 +1,11 @@
 package com.kakao.openaccount.service;
 
+import com.kakao.openaccount.domain.TransferCheck;
 import com.kakao.openaccount.dto.CacheDTO;
 import com.kakao.openaccount.dto.StateType;
 import com.kakao.openaccount.dto.TransferRequestDTO;
 import com.kakao.openaccount.dto.TransferResultDTO;
+import com.kakao.openaccount.repository.CheckWordRepository;
 import com.kakao.openaccount.repository.TransferHistoryRepository;
 import com.sun.jdi.request.DuplicateRequestException;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,8 @@ public class TransferRequestService {
 
     private final TransferHistoryRepository transferHistoryRepository;
 
+    private final CheckWordRepository checkWordRepository;
+
     // 요청
     public TransferResultDTO requestTransfer(TransferRequestDTO requestDTO) {
         long randomSequence = wordService.findRandomSequence();
@@ -40,7 +44,9 @@ public class TransferRequestService {
         }
         // 중복 요청이 아닐 경우에만
         saveCache(requestDTO);
-        // 이체요청
+        // DB에 정보 저정
+        saveTransferCheckData(requestDTO, randomSequence);
+        // 이체 요청
 
 
         TransferResultDTO result = TransferResultDTO.builder()
@@ -49,6 +55,16 @@ public class TransferRequestService {
 
         return result;
     }
+
+    private TransferCheck saveTransferCheckData(TransferRequestDTO requestDTO, long randomSequence) {
+        TransferCheck checkData = this.checkWordRepository.save(TransferCheck.builder()
+                .transferUUID(requestDTO.getTransferUUID())
+                .userUUID(requestDTO.getRequestUserUUID())
+                .wordSeq(randomSequence)
+                .build());
+        return checkData;
+    }
+
     private void saveCache(TransferRequestDTO requestDTO) {
         CacheDTO cache = CacheDTO.builder()
                 .cachingDate(LocalDateTime.now())

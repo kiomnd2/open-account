@@ -21,9 +21,6 @@ public class TransferHistoryDTO {
     @NotNull
     private String requestUserUUID;
 
-    @NotNull
-    private String transferUUID;
-
     private RequestType requestType;
 
     private StateType stateType;
