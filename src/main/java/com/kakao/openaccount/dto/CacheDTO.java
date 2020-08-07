@@ -16,7 +16,4 @@ public class CacheDTO {
     private String transferUUID;
 
     private LocalDateTime cachingDate;
-
-    private StateType type = StateType.NORMAL;
-
 }

@@ -28,9 +28,16 @@ public class WordService {
 
     public long findRandomSequence() {
         long count = wordRepository.count();
-        return (long) (Math.random() * count);
+        return (long) (Math.random() * count) + 1;
     }
 
+    public boolean isCorrectInputWord(long i, String input) {
+        return input.equals(getWord(i));
+    }
+
+    public String getWord(long i) {
+        return wordRepository.getOne(i).getWordName();
+    }
 
 
     @PostConstruct
@@ -42,6 +49,6 @@ public class WordService {
 
             wordRepository.saveAll(collect);
         }
-
     }
+
 }

@@ -1,6 +1,7 @@
 package com.kakao.openaccount.domain;
 
 
+import com.kakao.openaccount.dto.StateType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,5 +31,7 @@ public class TransferCheck {
     private String transferUUID;
 
     private long wordSeq;
+    
+    private StateType stateType;
 
 }

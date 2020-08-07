@@ -13,36 +13,44 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/transfer-auth")
+
 public class TransferController {
 
 
-    final TransferRequestService transferRequestService;
+    private final TransferRequestService transferRequestService;
 
-    @PostMapping(value ="{enterpriseCode}/{accountNo}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity certificationByTransfer(@RequestBody @Valid RequestUser requestUser, @PathVariable String enterpriseCode, @PathVariable String accountNo, Errors error ) {
+    @PostMapping(value ="/api/transfer-auth", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity certificationByTransfer(@RequestBody @Valid RequestUser requestUser, Errors error) {
 
         if(error.hasErrors()) {
             return ResponseEntity.badRequest().build();
         }
 
+
         // 거래 코드 임시 생성
-        UUID transferUUID = UUID.randomUUID();
+        String transactionUUID = transferRequestService.findTransactionUUID(requestUser);
+        if(transactionUUID == null ) {
+            transactionUUID = UUID.randomUUID().toString();
+        }
+
 
         TransferRequestDTO transferRequester = TransferRequestDTO.builder()
                 .requestUserUUID(requestUser.getRequestUserUUID())
-                .transferUUID(transferUUID.toString())
-                .accountNo(accountNo)
-                .bankCode(enterpriseCode)
+                .transferUUID(transactionUUID)
+                .accountNo(requestUser.getAccountNo())
+                .bankCode(requestUser.getBankCode())
+                .requestDate(LocalDateTime.now())
                 .requestType(RequestType.TRANSFER).build();
 
         // 요청..
         TransferResultDTO transferResult = transferRequestService.requestTransfer(transferRequester);
+
 
         if(transferResult.isError()) {
             return ResponseEntity.badRequest().body(transferResult); //

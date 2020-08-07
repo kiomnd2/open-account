@@ -31,13 +31,8 @@ public class TransferHistory {
     @Column(name = "transfer_uuid", nullable = false, length = 40)
     private String transferUUID;
 
-    @Column(name = "bank_code",  length = 20)
-    private String bankCode;
-
-    @Column(name = "account_no", length = 20)
-    private String accountNo;
-
     @Enumerated(EnumType.STRING)
+    @Column(name = "request_type", nullable = false)
     private RequestType requestType;
 
     @Column(name = "is_error")

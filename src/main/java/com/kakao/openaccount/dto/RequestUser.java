@@ -11,11 +11,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RequestUser {
-    
+
     private String requestUserUUID;
 
     private String userId;
 
     private String userName;
+
+    private String accountNo;
+
+    private String bankCode;
 
 }
