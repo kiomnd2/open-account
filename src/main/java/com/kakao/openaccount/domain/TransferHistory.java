@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
+@Table(name = "cert_history")
 public class TransferHistory {
 
     @Id @GeneratedValue
