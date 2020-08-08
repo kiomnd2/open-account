@@ -1,14 +1,12 @@
 package com.kakao.openaccount.domain;
 
 import com.kakao.openaccount.dto.RequestType;
-import com.kakao.openaccount.dto.StateType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 
