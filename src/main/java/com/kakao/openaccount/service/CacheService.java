@@ -11,8 +11,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 @Service
-@NoArgsConstructor
-@AllArgsConstructor
 public class CacheService {
 
     ConcurrentHashMap<String, CacheDTO> cache = new ConcurrentHashMap<>();
