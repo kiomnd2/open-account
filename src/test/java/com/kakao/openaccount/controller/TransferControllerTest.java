@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Description;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -59,6 +60,7 @@ class TransferControllerTest {
         this.cacheService.clear();
     }
 
+    @Description("계좌번호 12345 일때요청->성공")
     @Test
     public void requestTransfer_success() throws Exception {
         String userUUID = UUID.randomUUID().toString();
@@ -77,6 +79,7 @@ class TransferControllerTest {
     }
 
 
+    @Description("계좌번호 123이 아닐때 요청 ->실패")
     @Test
     public void requestTransfer_fail() throws Exception {
 
@@ -96,6 +99,7 @@ class TransferControllerTest {
 
     }
 
+    @Description("요청 후, 캐시사이즈 확인")
     @Test
     public void requestTransferAndConfirmCacheSize() throws Exception {
         String userUUID = UUID.randomUUID().toString();
@@ -119,6 +123,7 @@ class TransferControllerTest {
     }
 
 
+    @Description("1원 중복이체시 익셉션 처리 확인")
     @Test
     public void requestTransferAndDuplicateTransferCheckNotIncludeDatabase() throws Exception{
         String userUUID = UUID.randomUUID().toString();
@@ -139,6 +144,7 @@ class TransferControllerTest {
 
     }
 
+    @Description("재요청에 대한 처리")
     @Test
     public void requestTransferAndDuplicateTransferCheck() {
         String userUUID = UUID.randomUUID().toString();
@@ -163,6 +169,7 @@ class TransferControllerTest {
 
 
 
+    @Description("정상적으로  정상이력이 저장되었는지 확인")
     @Test
     public void requestTransferAndCheckSuccessHistory() {
         String userUUID = UUID.randomUUID().toString();
@@ -185,17 +192,16 @@ class TransferControllerTest {
 
         assertNotNull(history);
         assertThat(history.getRequestDate()).isAfterOrEqualTo(now);
-        assertThat(history.getTransferUUID()).isEqualTo(transferUUID);
         assertThat(history.getUserUUID()).isEqualTo(userUUID);
         assertThat(history.isError()).isFalse();
     }
 
 
+    @Description("정상적으로 실패 일겨이 남았는지 확인")
     @Test
     public void requestTransferAndCheckFailHistory() {
         String userUUID = UUID.randomUUID().toString();
         String transferUUID = UUID.randomUUID().toString();
-        long randomSequence = wordService.findRandomSequence();
 
 
         LocalDateTime now = LocalDateTime.now();
@@ -214,10 +220,11 @@ class TransferControllerTest {
 
         assertNotNull(history);
         assertThat(history.getRequestDate()).isAfterOrEqualTo(now);
-        assertThat(history.getTransferUUID()).isEqualTo(transferUUID);
         assertThat(history.getUserUUID()).isEqualTo(userUUID);
         assertThat(history.isError()).isTrue();
     }
+
+
 
 
 

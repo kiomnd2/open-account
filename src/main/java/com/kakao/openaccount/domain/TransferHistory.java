@@ -26,9 +26,6 @@ public class TransferHistory {
     @Column(name = "user_uuid", nullable = false, length = 40)
     private String userUUID;
 
-    @Column(name = "transfer_uuid", nullable = false, length = 40)
-    private String transferUUID;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "request_type", nullable = false)
     private RequestType requestType;

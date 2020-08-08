@@ -122,7 +122,6 @@ public class TransferRequestService {
     private void saveHistory(@Valid TransferResultDTO resultDTO, RequestType resultType) {
         String uuid = UUID.randomUUID().toString();
         TransferHistory history = TransferHistory.builder()
-                .transferUUID(resultDTO.getTransferUUID())
                 .userUUID(resultDTO.getRequestUserUUID())
                 .historyNo(uuid)
                 .requestDate(resultDTO.getRequestDate())
