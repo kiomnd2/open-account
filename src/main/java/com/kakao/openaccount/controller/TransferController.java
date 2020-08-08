@@ -35,10 +35,9 @@ public class TransferController {
 
         // 거래 코드 임시 생성
         String transactionUUID = transferRequestService.findTransactionUUID(requestUser);
-        if(transactionUUID == null ) {
+        if(transactionUUID == null) {
             transactionUUID = UUID.randomUUID().toString();
         }
-
 
         TransferRequestDTO transferRequester = TransferRequestDTO.builder()
                 .requestUserUUID(requestUser.getRequestUserUUID())
@@ -46,7 +45,7 @@ public class TransferController {
                 .accountNo(requestUser.getAccountNo())
                 .bankCode(requestUser.getBankCode())
                 .requestDate(LocalDateTime.now())
-                .requestType(RequestType.TRANSFER).build();
+                .requestType(RequestType.TRANSFER_INSERT).build();
 
         // 요청..
         TransferResultDTO transferResult = transferRequestService.requestTransfer(transferRequester);

@@ -23,7 +23,7 @@ public class TransferHistory {
     private long id;
 
     @Column(name = "history_no", nullable = false, length = 40)
-    private Long historyNo;
+    private String historyNo;
 
     @Column(name = "request_user_uuid", nullable = false, length = 40)
     private String requestUserUUID;

@@ -30,5 +30,7 @@ public class TransferResultDTO {
     private boolean error;
 
     private String message;
+
+    private ResultType resultType;
 }
 

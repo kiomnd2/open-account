@@ -23,7 +23,7 @@ public class TransferHistoryDTO {
 
     private RequestType requestType;
 
-    private StateType stateType;
+    private HistoryStateType type;
 
     private LocalDateTime requestDate;
 

@@ -19,14 +19,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -92,10 +90,10 @@ class TransferControllerTest {
 
 
         String transactionUUID = transferRequestService.findTransactionUUID(requestUser);
-        CacheDTO cache = cacheService.getCache(transactionUUID);
+        int cacheSize = cacheService.getCacheSize();
 
         assertNotNull(transactionUUID);
-        assertThat(transactionUUID).isEqualTo(cache.getTransferUUID());
+        assertThat(cacheSize).isZero(); // 성공후 잘 지워지는지
     }
 
 
@@ -107,7 +105,7 @@ class TransferControllerTest {
 
         TransferRequestDTO requestDTO = TransferRequestDTO.builder()
                 .requestDate(LocalDateTime.now())
-                .requestType(RequestType.TRANSFER)
+                .requestType(RequestType.TRANSFER_INSERT)
                 .requestUserUUID(userUUID)
                 .accountNo("123456789")
                 .bankCode("024")
@@ -115,7 +113,7 @@ class TransferControllerTest {
 
         cacheService.saveCache(requestDTO);
         // 중복 요청
-        assertThrows(EntityNotFoundException.class, ()-> transferRequestService.requestTransfer(requestDTO) );
+        assertThrows(DuplicateRequestException.class, ()-> transferRequestService.requestTransfer(requestDTO) );
 
     }
 
@@ -128,7 +126,7 @@ class TransferControllerTest {
 
         TransferRequestDTO requestDTO = TransferRequestDTO.builder()
                 .requestDate(LocalDateTime.now())
-                .requestType(RequestType.TRANSFER)
+                .requestType(RequestType.TRANSFER_INSERT)
                 .requestUserUUID(userUUID)
                 .accountNo("123456789")
                 .bankCode("024")
@@ -140,7 +138,6 @@ class TransferControllerTest {
 
         assertThrows(DuplicateRequestException.class, ()-> transferRequestService.requestTransfer(requestDTO) );
     }
-
 
 
 }

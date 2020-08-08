@@ -5,13 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.context.ApplicationEvent;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
 @Getter
 public class TransferRequestDTO {
@@ -32,5 +31,9 @@ public class TransferRequestDTO {
     private RequestType requestType;
 
     private LocalDateTime requestDate;
+
+    public void updateRequestType(RequestType requestType) {
+        this.requestType = requestType;
+    }
 
 }

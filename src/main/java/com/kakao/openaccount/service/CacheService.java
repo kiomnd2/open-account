@@ -4,7 +4,6 @@ import com.kakao.openaccount.dto.CacheDTO;
 import com.kakao.openaccount.dto.TransferRequestDTO;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;

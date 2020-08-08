@@ -1,21 +1,16 @@
 package com.kakao.openaccount.service;
 
 import com.kakao.openaccount.domain.TransferCheck;
-import com.kakao.openaccount.dto.RequestUser;
-import com.kakao.openaccount.dto.StateType;
-import com.kakao.openaccount.dto.TransferRequestDTO;
-import com.kakao.openaccount.dto.TransferResultDTO;
+import com.kakao.openaccount.domain.TransferHistory;
+import com.kakao.openaccount.dto.*;
 import com.kakao.openaccount.exception.service.DuplicateRequestException;
-import com.kakao.openaccount.netty.ConnectionManager;
 import com.kakao.openaccount.repository.CheckWordRepository;
 import com.kakao.openaccount.repository.TransferHistoryRepository;
-import io.netty.channel.Channel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
-import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -27,42 +22,44 @@ public class TransferRequestService {
 
     private final CacheService cacheService;
 
-    private final ConnectionManager connectionManager;
-
     private final TransferHistoryRepository transferHistoryRepository;
 
     private final CheckWordRepository checkWordRepository;
 
+    private final  AsyncQueue asyncQueue;
+
+
+
+
     // 요청
     public TransferResultDTO requestTransfer(TransferRequestDTO requestDTO) {
-        long randomSequence = wordService.findRandomSequence();
 
-
-        // 중복요청인지 확인
-        if(cacheService.hasCached(requestDTO.getTransferUUID())) {
-            Optional<TransferCheck> byTransferUUID = checkWordRepository.findByTransferUUID(requestDTO.getTransferUUID());
-            // 현재 캐시에는 데이ㅌ가 있는데
-            TransferCheck transferCheck = byTransferUUID.orElseThrow(EntityNotFoundException::new);
-            StateType stateType = transferCheck.getStateType();
-            // 중복요청중, 실제 이체에 실패했을 경우에는 다시 요청을 보내준다
-            if(!stateType.equals(StateType.EXPIRED) || !stateType.equals(StateType.ERROR_NOT_SEND)) {
-                // 중복이체 안되도록
+        // 재요청일 경우에..
+        TransferCheck byTransferUUID = checkWordRepository.findByTransferUUID(requestDTO.getTransferUUID());
+        if(byTransferUUID != null ) {
+            StateType stateType = byTransferUUID.getStateType();
+            // 재시도 시, 오류임에도 인데 1원이체에 성공했을 경우를 제외하고 다시 시도 하지 않는다
+            if (!stateType.equals(StateType.ERROR_SEND)) { // or !Expired
                 throw new DuplicateRequestException();
             }
         }
+        // 중복요청인지 확인
+        if(cacheService.hasCached(requestDTO.getTransferUUID())) {
+            // 만약 중복 거래라면, 익셉션 처리
+            throw new DuplicateRequestException();
+        }
         cacheService.saveCache(requestDTO);
-        // DB에 정보 저정
+
+        // 랜덤단어 출력
+        long randomSequence = wordService.findRandomSequence();
+
+        // 최초 거래 트렌젝션 추가
         saveTransferCheckData(requestDTO, randomSequence);
 
-        /*// 이체 요청
-        TransferResultDTO response = call(requestDTO);
-        */
+        // 이체 요청
+        TransferResultDTO response = request(requestDTO);
 
-        TransferResultDTO result = TransferResultDTO.builder()
-                .requestUserUUID(requestDTO.getRequestUserUUID())
-                .build();
-
-        return result;
+        return response;
     }
 
     public String findTransactionUUID(RequestUser requestUser) {
@@ -82,18 +79,48 @@ public class TransferRequestService {
         .build());
     }
 
-    protected TransferResultDTO call(TransferRequestDTO transferRequestDTO) {
-        Channel connectChannel = connectionManager.start();
-        connectChannel.writeAndFlush("히히히히히히");
-        // ObjectMapper;
+
+    public TransferResultDTO request(TransferRequestDTO transferRequestDTO) {
+
+        TransferResultDTO resultDTO = asyncQueue.addRequest(transferRequestDTO);
+        if (resultDTO.isError()) {
+            // 1원이체에 성공했는지 확인
+            transferRequestDTO.updateRequestType(RequestType.TRANSFER_SEARCH);
+            TransferResultDTO searchResult = asyncQueue.addRequest(transferRequestDTO);
+
+            // 조회 이력 쌓기
+            saveHistory(searchResult, RequestType.TRANSFER_SEARCH);
+
+            if (!searchResult.isError()) { // 조회햇는데 정상이 확인되면
+                return resultDTO;
+            } else {
+                cacheService.removeCache(transferRequestDTO.getTransferUUID()); // 캐시 제거
+                return requestTransfer(transferRequestDTO); // 재요청
+            }
+        }
+
+        // 캐시제거
+        cacheService.removeCache(transferRequestDTO.getTransferUUID());
+        //이력 쌓기
+        saveHistory(resultDTO, RequestType.TRANSFER_INSERT);
+
+        return resultDTO;
+    }
 
 
-        TransferResultDTO result = TransferResultDTO.builder()
-                .transferUUID(transferRequestDTO.getTransferUUID())
+    private void saveHistory(TransferResultDTO resultDTO, RequestType resultType) {
+        String uuid = UUID.randomUUID().toString();
+        TransferHistory history = TransferHistory.builder()
+                .transferUUID(resultDTO.getTransferUUID())
+                .requestUserUUID(resultDTO.getRequestUserUUID())
+                .historyNo(uuid)
+                .requestDate(resultDTO.getRequestDate())
+                .responseDate(resultDTO.getResponseDate())
+                .requestType(resultType)
+                .error(resultDTO.isError())
                 .build();
 
-        return result;
-
+        transferHistoryRepository.save(history);
     }
 
 
