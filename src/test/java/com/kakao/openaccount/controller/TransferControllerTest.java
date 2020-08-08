@@ -1,11 +1,14 @@
 package com.kakao.openaccount.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kakao.openaccount.domain.TransferCheck;
 import com.kakao.openaccount.domain.TransferHistory;
 import com.kakao.openaccount.dto.RequestType;
 import com.kakao.openaccount.dto.RequestUser;
+import com.kakao.openaccount.dto.StateType;
 import com.kakao.openaccount.dto.TransferRequestDTO;
 import com.kakao.openaccount.exception.service.DuplicateRequestException;
+import com.kakao.openaccount.repository.CheckWordRepository;
 import com.kakao.openaccount.repository.TransferHistoryRepository;
 import com.kakao.openaccount.service.CacheService;
 import com.kakao.openaccount.service.TransferRequestService;
@@ -50,6 +53,9 @@ class TransferControllerTest {
 
     @Autowired
     TransferRequestService transferRequestService;
+
+    @Autowired
+    CheckWordRepository checkWordRepository;
 
     @Autowired
     TransferHistoryRepository transferHistoryRepository;
@@ -188,7 +194,7 @@ class TransferControllerTest {
         transferRequestService.requestTransfer(requestDTO);
 
         // 히스토리가 확인되는지 체크
-        TransferHistory history = transferHistoryRepository.findByUserUUIDAndTransferUUID(userUUID, transferUUID);
+        TransferHistory history = transferHistoryRepository.findByUserUUID(userUUID);
 
         assertNotNull(history);
         assertThat(history.getRequestDate()).isAfterOrEqualTo(now);
@@ -216,7 +222,7 @@ class TransferControllerTest {
         transferRequestService.requestTransfer(requestDTO);
 
         // 히스토리가 확인되는지 체크
-        TransferHistory history = transferHistoryRepository.findByUserUUIDAndTransferUUID(userUUID, transferUUID);
+        TransferHistory history = transferHistoryRepository.findByUserUUID(userUUID);
 
         assertNotNull(history);
         assertThat(history.getRequestDate()).isAfterOrEqualTo(now);
@@ -224,6 +230,31 @@ class TransferControllerTest {
         assertThat(history.isError()).isTrue();
     }
 
+
+
+    @Description("성공적인 이체후, 트렌젝션이 변경 되었는지 확인")
+    @Test
+    public void requestTransferAndCheckTransaction() {
+        String userUUID = UUID.randomUUID().toString();
+        String transferUUID = UUID.randomUUID().toString();
+
+
+        LocalDateTime now = LocalDateTime.now();
+        TransferRequestDTO requestDTO = TransferRequestDTO.builder()
+                .requestDate(now)
+                .requestType(RequestType.TRANSFER_INSERT)
+                .requestUserUUID(userUUID)
+                .accountNo("123456789")
+                .bankCode("024")
+                .transferUUID(transferUUID).build();
+
+        transferRequestService.requestTransfer(requestDTO);
+
+        TransferCheck byUserUUIDAndTransferUUID = checkWordRepository.findByUserUUIDAndTransferUUID(userUUID, transferUUID);
+
+        assertThat(byUserUUIDAndTransferUUID.getStateType()).isEqualTo(StateType.SUCCESS);
+
+    }
 
 
 
