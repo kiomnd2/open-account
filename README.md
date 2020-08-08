@@ -88,5 +88,5 @@ requestURL: http://localhost:8080/api/transfer-auth
 
 
 #### 4. 차후 구현
-* 레디스를 사용한 임시 캐싱 싱 
+* 레디스를 사용한 임시 캐싱
 * 레빗엠큐를 사용한 비동기 메시징 처리
