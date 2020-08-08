@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import javax.validation.Valid;
 import java.util.UUID;
 
 @Service
@@ -29,10 +30,8 @@ public class TransferRequestService {
     private final  AsyncQueue asyncQueue;
 
 
-
-
     // 요청
-    public TransferResultDTO requestTransfer(TransferRequestDTO requestDTO) {
+    public TransferResultDTO requestTransfer(@Valid TransferRequestDTO requestDTO) {
 
         // 재요청일 경우에..
         TransferCheck byTransferUUID = checkWordRepository.findByTransferUUID(requestDTO.getTransferUUID());
@@ -79,17 +78,23 @@ public class TransferRequestService {
         .build());
     }
 
+    public void updateTransferCheckData() {
 
-    public TransferResultDTO request(TransferRequestDTO transferRequestDTO) {
+    }
+
+
+    public TransferResultDTO request(@Valid TransferRequestDTO transferRequestDTO) {
 
         TransferResultDTO resultDTO = asyncQueue.addRequest(transferRequestDTO);
         if (resultDTO.isError()) {
             // 1원이체에 성공했는지 확인
+
+            // 조회 이력 쌓기
+            saveHistory(resultDTO, RequestType.TRANSFER_INSERT);
+
             transferRequestDTO.updateRequestType(RequestType.TRANSFER_SEARCH);
             TransferResultDTO searchResult = asyncQueue.addRequest(transferRequestDTO);
 
-            // 조회 이력 쌓기
-            saveHistory(searchResult, RequestType.TRANSFER_SEARCH);
 
             if (!searchResult.isError()) { // 조회햇는데 정상이 확인되면
                 return resultDTO;
@@ -104,15 +109,16 @@ public class TransferRequestService {
         //이력 쌓기
         saveHistory(resultDTO, RequestType.TRANSFER_INSERT);
 
+
         return resultDTO;
     }
 
 
-    private void saveHistory(TransferResultDTO resultDTO, RequestType resultType) {
+    private void saveHistory(@Valid TransferResultDTO resultDTO, RequestType resultType) {
         String uuid = UUID.randomUUID().toString();
         TransferHistory history = TransferHistory.builder()
                 .transferUUID(resultDTO.getTransferUUID())
-                .requestUserUUID(resultDTO.getRequestUserUUID())
+                .userUUID(resultDTO.getRequestUserUUID())
                 .historyNo(uuid)
                 .requestDate(resultDTO.getRequestDate())
                 .responseDate(resultDTO.getResponseDate())

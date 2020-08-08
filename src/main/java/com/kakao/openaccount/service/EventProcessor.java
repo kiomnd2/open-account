@@ -6,7 +6,6 @@ import com.kakao.openaccount.dto.TransferRequestDTO;
 import com.kakao.openaccount.dto.TransferResultDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -44,7 +43,7 @@ public class EventProcessor {
 
 
                 // 567 로 시작하는 계좌번호는 무조건 실패
-                if (requestDTO.getAccountNo().startsWith("567")) {
+                else  {
                     resultDTO = TransferResultDTO.builder()
                             .transferUUID(requestDTO.getTransferUUID())
                             .requestUserUUID(requestDTO.getRequestUserUUID())

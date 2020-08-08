@@ -25,8 +25,8 @@ public class TransferHistory {
     @Column(name = "history_no", nullable = false, length = 40)
     private String historyNo;
 
-    @Column(name = "request_user_uuid", nullable = false, length = 40)
-    private String requestUserUUID;
+    @Column(name = "user_uuid", nullable = false, length = 40)
+    private String userUUID;
 
     @Column(name = "transfer_uuid", nullable = false, length = 40)
     private String transferUUID;

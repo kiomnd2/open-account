@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.context.ApplicationEvent;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
@@ -25,11 +26,11 @@ public class TransferRequestDTO {
     private String bankCode;
 
     @NotNull
-    @Max(20)
     private String accountNo;
 
     private RequestType requestType;
 
+    @DateTimeFormat
     private LocalDateTime requestDate;
 
     public void updateRequestType(RequestType requestType) {

@@ -29,6 +29,7 @@ public class TransferResultDTO {
 
     private boolean error;
 
+    @Max(100)
     private String message;
 
     private ResultType resultType;

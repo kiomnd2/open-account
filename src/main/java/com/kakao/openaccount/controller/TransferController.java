@@ -1,9 +1,6 @@
 package com.kakao.openaccount.controller;
 
-import com.kakao.openaccount.dto.RequestType;
-import com.kakao.openaccount.dto.RequestUser;
-import com.kakao.openaccount.dto.TransferRequestDTO;
-import com.kakao.openaccount.dto.TransferResultDTO;
+import com.kakao.openaccount.dto.*;
 import com.kakao.openaccount.service.TransferRequestService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,7 +47,7 @@ public class TransferController {
         // 요청..
         TransferResultDTO transferResult = transferRequestService.requestTransfer(transferRequester);
 
-
+        // 전송에 실패했을 경우에만
         if(transferResult.isError()) {
             return ResponseEntity.badRequest().body(transferResult); //
         }

@@ -1,11 +1,12 @@
 package com.kakao.openaccount.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kakao.openaccount.dto.CacheDTO;
+import com.kakao.openaccount.domain.TransferHistory;
 import com.kakao.openaccount.dto.RequestType;
 import com.kakao.openaccount.dto.RequestUser;
 import com.kakao.openaccount.dto.TransferRequestDTO;
 import com.kakao.openaccount.exception.service.DuplicateRequestException;
+import com.kakao.openaccount.repository.TransferHistoryRepository;
 import com.kakao.openaccount.service.CacheService;
 import com.kakao.openaccount.service.TransferRequestService;
 import com.kakao.openaccount.service.WordService;
@@ -49,6 +50,9 @@ class TransferControllerTest {
     @Autowired
     TransferRequestService transferRequestService;
 
+    @Autowired
+    TransferHistoryRepository transferHistoryRepository;
+
 
     @AfterEach
     public void afterEach() {
@@ -56,7 +60,7 @@ class TransferControllerTest {
     }
 
     @Test
-    public void requestTransfer() throws Exception {
+    public void requestTransfer_success() throws Exception {
         String userUUID = UUID.randomUUID().toString();
         RequestUser requestUser = RequestUser.builder()
                 .requestUserUUID(userUUID)
@@ -70,6 +74,26 @@ class TransferControllerTest {
                 .content(objectMapper.writeValueAsBytes(requestUser)))
                 .andExpect(status().isOk())
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+    }
+
+
+    @Test
+    public void requestTransfer_fail() throws Exception {
+
+        String userUUID = UUID.randomUUID().toString();
+        RequestUser requestUser = RequestUser.builder()
+                .requestUserUUID(userUUID)
+                .userId("kiomnd2")
+                .userName("홍길동")
+                .accountNo("5677890")
+                .bankCode("042")
+                .build();
+        mockMvc.perform(post("/api/transfer-auth")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(requestUser)))
+                .andExpect(status().isBadRequest())
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+
     }
 
     @Test
@@ -138,6 +162,57 @@ class TransferControllerTest {
 
         assertThrows(DuplicateRequestException.class, ()-> transferRequestService.requestTransfer(requestDTO) );
     }
+
+
+
+    @Test
+    public void requestTransferAndCheckSuccessHistory() {
+        String userUUID = UUID.randomUUID().toString();
+        String transferUUID = UUID.randomUUID().toString();
+
+
+        TransferRequestDTO requestDTO = TransferRequestDTO.builder()
+                .requestDate(LocalDateTime.now())
+                .requestType(RequestType.TRANSFER_INSERT)
+                .requestUserUUID(userUUID)
+                .accountNo("123456789")
+                .bankCode("024")
+                .transferUUID(transferUUID).build();
+
+        transferRequestService.requestTransfer(requestDTO);
+
+        // 히스토리가 확인되는지 체크
+        TransferHistory history = transferHistoryRepository.findByUserUUIDAndTransferUUID(userUUID, transferUUID);
+
+        assertNotNull(history);
+        assertThat(history.isError()).isFalse();
+    }
+
+
+    @Test
+    public void requestTransferAndCheckFailHistory() {
+        String userUUID = UUID.randomUUID().toString();
+        String transferUUID = UUID.randomUUID().toString();
+        long randomSequence = wordService.findRandomSequence();
+
+
+        TransferRequestDTO requestDTO = TransferRequestDTO.builder()
+                .requestDate(LocalDateTime.now())
+                .requestType(RequestType.TRANSFER_INSERT)
+                .requestUserUUID(userUUID)
+                .accountNo("56456789")
+                .bankCode("024")
+                .transferUUID(transferUUID).build();
+
+        transferRequestService.requestTransfer(requestDTO);
+
+        // 히스토리가 확인되는지 체크
+        TransferHistory history = transferHistoryRepository.findByUserUUIDAndTransferUUID(userUUID, transferUUID);
+
+        assertNotNull(history);
+        assertThat(history.isError()).isTrue();
+    }
+
 
 
 }
