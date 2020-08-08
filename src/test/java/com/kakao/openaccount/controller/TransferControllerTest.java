@@ -171,8 +171,9 @@ class TransferControllerTest {
         String transferUUID = UUID.randomUUID().toString();
 
 
+        LocalDateTime now = LocalDateTime.now();
         TransferRequestDTO requestDTO = TransferRequestDTO.builder()
-                .requestDate(LocalDateTime.now())
+                .requestDate(now)
                 .requestType(RequestType.TRANSFER_INSERT)
                 .requestUserUUID(userUUID)
                 .accountNo("123456789")
@@ -185,6 +186,9 @@ class TransferControllerTest {
         TransferHistory history = transferHistoryRepository.findByUserUUIDAndTransferUUID(userUUID, transferUUID);
 
         assertNotNull(history);
+        assertThat(history.getRequestDate()).isAfterOrEqualTo(now);
+        assertThat(history.getTransferUUID()).isEqualTo(transferUUID);
+        assertThat(history.getUserUUID()).isEqualTo(userUUID);
         assertThat(history.isError()).isFalse();
     }
 
@@ -196,8 +200,9 @@ class TransferControllerTest {
         long randomSequence = wordService.findRandomSequence();
 
 
+        LocalDateTime now = LocalDateTime.now();
         TransferRequestDTO requestDTO = TransferRequestDTO.builder()
-                .requestDate(LocalDateTime.now())
+                .requestDate(now)
                 .requestType(RequestType.TRANSFER_INSERT)
                 .requestUserUUID(userUUID)
                 .accountNo("56456789")
@@ -210,6 +215,9 @@ class TransferControllerTest {
         TransferHistory history = transferHistoryRepository.findByUserUUIDAndTransferUUID(userUUID, transferUUID);
 
         assertNotNull(history);
+        assertThat(history.getRequestDate()).isAfterOrEqualTo(now);
+        assertThat(history.getTransferUUID()).isEqualTo(transferUUID);
+        assertThat(history.getUserUUID()).isEqualTo(userUUID);
         assertThat(history.isError()).isTrue();
     }
 
