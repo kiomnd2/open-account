@@ -56,9 +56,8 @@ public class TransferRequestService {
         saveTransferCheckData(requestDTO, randomSequence);
 
         // 이체 요청
-        TransferResultDTO response = request(requestDTO);
 
-        return response;
+        return request(requestDTO);
     }
 
     public String findTransactionUUID(RequestUser requestUser) {
@@ -78,11 +77,6 @@ public class TransferRequestService {
         .build());
     }
 
-    public void updateTransferCheckData() {
-
-    }
-
-
     public TransferResultDTO request(@Valid TransferRequestDTO transferRequestDTO) {
 
         TransferResultDTO resultDTO = asyncQueue.addRequest(transferRequestDTO);
@@ -95,11 +89,11 @@ public class TransferRequestService {
             transferRequestDTO.updateRequestType(RequestType.TRANSFER_SEARCH);
             TransferResultDTO searchResult = asyncQueue.addRequest(transferRequestDTO);
 
+            cacheService.removeCache(transferRequestDTO.getTransferUUID()); // 캐시 제거
 
             if (!searchResult.isError()) { // 조회햇는데 정상이 확인되면
                 return resultDTO;
             } else {
-                cacheService.removeCache(transferRequestDTO.getTransferUUID()); // 캐시 제거
                 return requestTransfer(transferRequestDTO); // 재요청
             }
         }
