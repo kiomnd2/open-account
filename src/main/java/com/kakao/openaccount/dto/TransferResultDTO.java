@@ -29,5 +29,9 @@ public class TransferResultDTO {
     private String message;
 
     private ResultType resultType;
+
+    public void updateMessage(String message) {
+        this.message = message;
+    }
 }
 

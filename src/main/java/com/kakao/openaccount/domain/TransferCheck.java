@@ -34,5 +34,10 @@ public class TransferCheck {
     
     private StateType stateType;
 
+    public TransferCheck updateStateType(StateType stateType) {
+        this.stateType = stateType;
+        return this;
+    }
+
 
 }

@@ -113,10 +113,8 @@ class TransferControllerTest {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
 
 
-        String transactionUUID = transferRequestService.findTransactionUUID(requestUser);
         int cacheSize = cacheService.getCacheSize();
 
-        assertNotNull(transactionUUID);
         assertThat(cacheSize).isZero(); // 성공후 잘 지워지는지
     }
 
