@@ -44,7 +44,7 @@ requestURL: http://localhost:8080/api/transfer-auth
     "bankCode": "123"
 }
 ```
-* 응답
+* 응답 - 실패
 ~~~json
 {
     "requestUserUUID": "223456788",
@@ -72,7 +72,7 @@ requestURL: http://localhost:8080/api/transfer-auth
 }
 ~~~
 
-* 실패
+* 응답 - 성공
 ~~~json
 {
     "requestUserUUID": "1231111188",
