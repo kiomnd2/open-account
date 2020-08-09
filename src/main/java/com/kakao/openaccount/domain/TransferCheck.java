@@ -7,16 +7,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Entity
+@Table(name = "transfer_check")
 public class TransferCheck {
 
 
@@ -33,6 +31,11 @@ public class TransferCheck {
     private long wordSeq;
     
     private StateType stateType;
+
+    public TransferCheck updateStateType(StateType stateType) {
+        this.stateType = stateType;
+        return this;
+    }
 
 
 }

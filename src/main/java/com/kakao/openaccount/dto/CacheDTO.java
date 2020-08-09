@@ -1,6 +1,7 @@
 package com.kakao.openaccount.dto;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.Max;
@@ -8,10 +9,7 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
-@EqualsAndHashCode
 public class CacheDTO {
 
     @NotNull

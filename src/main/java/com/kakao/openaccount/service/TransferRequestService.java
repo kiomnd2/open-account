@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -38,7 +39,8 @@ public class TransferRequestService {
         if(byTransferUUID != null ) {
             StateType stateType = byTransferUUID.getStateType();
             // 재시도 시, 오류임에도 인데 1원이체에 성공했을 경우를 제외하고 다시 시도 하지 않는다
-            if (!stateType.equals(StateType.ERROR_SEND)) { // or !Expired
+            if (stateType !=StateType.ERROR_SEND && stateType != StateType.SUCCESS) { // or !Expired
+                System.out.println(stateType);
                 throw new DuplicateRequestException();
             }
         }
@@ -53,35 +55,37 @@ public class TransferRequestService {
         long randomSequence = wordService.findRandomSequence();
 
         // 최초 거래 트렌젝션 추가
-        saveTransferCheckData(requestDTO, randomSequence);
+        TransferCheck transaction = saveTransferCheckData(requestDTO, randomSequence);
 
         // 이체 요청
-        TransferResultDTO response = request(requestDTO);
 
-        return response;
+        TransferResultDTO result = request(requestDTO);
+
+        // 거래정보 갱신
+        checkWordRepository.save(transaction.updateStateType(StateType.SUCCESS));
+
+        return result;
     }
 
     public String findTransactionUUID(RequestUser requestUser) {
-        TransferCheck transferCheck = this.checkWordRepository.findByUserUUID(requestUser.getRequestUserUUID());
-        if (transferCheck != null) {
+        List<TransferCheck> checkList = this.checkWordRepository.findByUserUUID(requestUser.getRequestUserUUID());
+        TransferCheck transferCheck = checkList
+                .stream().filter(f -> (f.getStateType() != null && f.getStateType() != StateType.SUCCESS)).findFirst().orElse(null);
+        if ( transferCheck != null ) {
             return transferCheck.getTransferUUID();
         }
+
         return null;
     }
 
-    public void saveTransferCheckData(TransferRequestDTO requestDTO, long randomSequence) {
-        this.checkWordRepository.save(TransferCheck.builder()
-            .transferUUID(requestDTO.getTransferUUID())
-            .userUUID(requestDTO.getRequestUserUUID())
-            .wordSeq(randomSequence)
-            .stateType(StateType.NORMAL)
-        .build());
+    public TransferCheck saveTransferCheckData(TransferRequestDTO requestDTO, long randomSequence) {
+        return this.checkWordRepository.save(TransferCheck.builder()
+                .transferUUID(requestDTO.getTransferUUID())
+                .userUUID(requestDTO.getRequestUserUUID())
+                .wordSeq(randomSequence)
+                .stateType(StateType.NORMAL)
+                .build());
     }
-
-    public void updateTransferCheckData() {
-
-    }
-
 
     public TransferResultDTO request(@Valid TransferRequestDTO transferRequestDTO) {
 
@@ -95,11 +99,12 @@ public class TransferRequestService {
             transferRequestDTO.updateRequestType(RequestType.TRANSFER_SEARCH);
             TransferResultDTO searchResult = asyncQueue.addRequest(transferRequestDTO);
 
+            cacheService.removeCache(transferRequestDTO.getTransferUUID()); // 캐시 제거
 
             if (!searchResult.isError()) { // 조회햇는데 정상이 확인되면
+                resultDTO.updateMessage(searchResult.getMessage());
                 return resultDTO;
             } else {
-                cacheService.removeCache(transferRequestDTO.getTransferUUID()); // 캐시 제거
                 return requestTransfer(transferRequestDTO); // 재요청
             }
         }
@@ -117,7 +122,6 @@ public class TransferRequestService {
     private void saveHistory(@Valid TransferResultDTO resultDTO, RequestType resultType) {
         String uuid = UUID.randomUUID().toString();
         TransferHistory history = TransferHistory.builder()
-                .transferUUID(resultDTO.getTransferUUID())
                 .userUUID(resultDTO.getRequestUserUUID())
                 .historyNo(uuid)
                 .requestDate(resultDTO.getRequestDate())

@@ -32,7 +32,7 @@ public class TransferController {
 
         // 거래 코드 임시 생성
         String transactionUUID = transferRequestService.findTransactionUUID(requestUser);
-        if(transactionUUID == null) {
+        if(transactionUUID == null ) {
             transactionUUID = UUID.randomUUID().toString();
         }
 
