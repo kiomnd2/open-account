@@ -63,7 +63,7 @@ public class EventProcessor {
                         .responseDate(LocalDateTime.now())
                         .error(false)
                         .resultType(ResultType.SUCCESS)
-                        .message("응답에는 실패했즈만 1원 이체 성공을 확인했습니다.")
+                        .message("응답에는 실패했지만 1원 이체 성공을 확인했습니다.")
                         .build();
             }
         }
