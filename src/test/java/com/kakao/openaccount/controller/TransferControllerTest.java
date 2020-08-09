@@ -68,7 +68,7 @@ class TransferControllerTest {
 
     @Description("계좌번호 12345 일때요청->성공")
     @Test
-    public void requestTransfer_success() throws Exception {
+    public void 이체요청_성공() throws Exception {
         String userUUID = UUID.randomUUID().toString();
         RequestUser requestUser = RequestUser.builder()
                 .requestUserUUID(userUUID)
@@ -87,7 +87,7 @@ class TransferControllerTest {
 
     @Description("계좌번호 123이 아닐때 요청 ->실패")
     @Test
-    public void requestTransfer_fail() throws Exception {
+    public void 이체요청_실패() throws Exception {
 
         String userUUID = UUID.randomUUID().toString();
         RequestUser requestUser = RequestUser.builder()
@@ -107,7 +107,7 @@ class TransferControllerTest {
 
     @Description("요청 후, 캐시사이즈 확인")
     @Test
-    public void requestTransferAndConfirmCacheSize() throws Exception {
+    public void 이채요청_성공_이체_후_캐시_정상제거확인() throws Exception {
         String userUUID = UUID.randomUUID().toString();
         RequestUser requestUser = RequestUser.builder()
                 .requestUserUUID(userUUID)
@@ -131,7 +131,7 @@ class TransferControllerTest {
 
     @Description("1원 중복이체시 익셉션 처리 확인")
     @Test
-    public void requestTransferAndDuplicateTransferCheckNotIncludeDatabase() throws Exception{
+    public void 이체요청_실패_중복요청시_중복에러확인() throws Exception{
         String userUUID = UUID.randomUUID().toString();
         String transferUUID = UUID.randomUUID().toString();
 
@@ -152,7 +152,7 @@ class TransferControllerTest {
 
     @Description("재요청에 대한 처리")
     @Test
-    public void requestTransferAndDuplicateTransferCheck() {
+    public void 이체요청_실패_이미_진행중인_요청이있는데_재요청 () {
         String userUUID = UUID.randomUUID().toString();
         String transferUUID = UUID.randomUUID().toString();
         long randomSequence = wordService.findRandomSequence();
@@ -177,7 +177,7 @@ class TransferControllerTest {
 
     @Description("정상적으로  정상이력이 저장되었는지 확인")
     @Test
-    public void requestTransferAndCheckSuccessHistory() {
+    public void 이체요청_성공시_히스토리정보가_정상적으로_쌓이는지확인() {
         String userUUID = UUID.randomUUID().toString();
         String transferUUID = UUID.randomUUID().toString();
 
@@ -205,7 +205,7 @@ class TransferControllerTest {
 
     @Description("정상적으로 실패 일겨이 남았는지 확인")
     @Test
-    public void requestTransferAndCheckFailHistory() {
+    public void 이체요청_실패시_히스토리정보가_정상적으로_쌓이는지확인() {
         String userUUID = UUID.randomUUID().toString();
         String transferUUID = UUID.randomUUID().toString();
 
@@ -234,7 +234,7 @@ class TransferControllerTest {
 
     @Description("성공적인 이체후, 트렌젝션이 변경 되었는지 확인")
     @Test
-    public void requestTransferAndCheckTransaction() {
+    public void 이체성공_트렌젝션이_성공으로_변경되었는지_확인() {
         String userUUID = UUID.randomUUID().toString();
         String transferUUID = UUID.randomUUID().toString();
 
